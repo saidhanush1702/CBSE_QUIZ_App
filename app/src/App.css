@@ -1,7 +1,17 @@
+
+/* THIS BLOCK IS FOR BACKGROUND UI THEME*/
+body, html, #root {
+  height: 100%;
+  margin: 0;
+  font-family: Arial, sans-serif;
+}
 .App {
   text-align: center;
+  display: flex;
+  min-height: 100vh;
+  background: linear-gradient(to bottom, #A8E6CF, #FFFFFF, #C398E5);
 }
-
+/*ENDED HERE */
 .App-logo {
   height: 40vmin;
   pointer-events: none;
