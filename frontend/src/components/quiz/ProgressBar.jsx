@@ -3,15 +3,15 @@ export default function ProgressBar({ current, total }) {
 
     return (
         <div className="mx-10">
+            <p className="text-sm my-1 text-gray-700">
+                Question {current} of {total}
+            </p>
             <div className="w-full h-1.5 bg-gray-300 rounded-full">
                 <div
                     className="h-full bg-[#8000ff] rounded-full transition-all"
                     style={{ width: `${width}%` }}
                 />
             </div>
-            <p className="text-sm mt-1 text-gray-700">
-                {current} of {total} Complete
-            </p>
         </div>
     );
 }

@@ -16,11 +16,16 @@ export default function OptionButton({
     return (
         <button
             disabled={disabled}
-            className={`w-[44%] py-4 px-4 rounded-xl text-white text-lg font-medium mb-4 transition-colors duration-200
+            className={`w-[44%] py-4 px-4 rounded-xl text-white text-lg font-medium mb-4 transition-colors duration-200 flex gap-5
         ${style} ${disabled && "opacity-75 cursor-not-allowed"}`}
             onClick={() => onSelect(id)}
         >
-            {id}. {text}
+            <div className="bg-white rounded-full text-black h-7 w-7">
+                {id}
+            </div>
+            <div className="text-[#2f247f]">
+                {text}
+            </div>
         </button>
     );
 }

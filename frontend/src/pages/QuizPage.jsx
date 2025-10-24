@@ -51,14 +51,16 @@ export default function QuizPage() {
     return (
         <>
             <Header />
-            <ProgressBar current={currentIndex + 1} total={questions.length} />
-            <QuestionCard
-                q={questions[currentIndex]}
-                onAnswer={handleAnswer}
-                selected={selected}
-                isCorrect={isCorrect}
-            />
-            <FooterNav onNext={nextQuestion} />
+            <div className="px-30">
+                <ProgressBar current={currentIndex + 1} total={questions.length} />
+                <QuestionCard
+                    q={questions[currentIndex]}
+                    onAnswer={handleAnswer}
+                    selected={selected}
+                    isCorrect={isCorrect}
+                />
+                <FooterNav onNext={nextQuestion} />
+            </div>
         </>
     );
 }
