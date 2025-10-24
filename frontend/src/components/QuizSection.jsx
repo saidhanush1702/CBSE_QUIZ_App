@@ -1,6 +1,4 @@
 
-import React from "react";
-
 const QuizSection = ({ title, quizzes }) => {
   return (
     <div className="bg-white rounded-2xl shadow-md p-6 w-80 max-w-md">
@@ -17,7 +15,7 @@ const QuizSection = ({ title, quizzes }) => {
                 <p className="font-medium">{quiz.title}</p>
                 <p className="text-sm text-gray-500">{quiz.description}</p>
               </div>
-              <button className="bg-purple-400 hover:bg-purple-500 text-white px-4 py-2 rounded-xl">
+              <button className="bg-purple-400 hover:bg-amber-300 text-white px-4 py-2 rounded-xl">
                 Start
               </button>
             </div>
