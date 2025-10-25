@@ -26,7 +26,7 @@ const Home = () => {
         {/* Container for the two cards */}
         <div className="flex gap-10">
           {/* Applied Quizzes Section - Box 1 */}
-          <div className="w-130 h-170 shrink-0 rounded-[10%] border border-gray-300 shadow-[0px_4px_4px_0px_rgba(0,0,0,0.25)] p-6 flex flex-col bg-white mt-6">
+          <div className=" overflow-y-auto [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden w-130 h-170 shrink-0 rounded-[10%] border border-gray-300 shadow-[0px_4px_4px_0px_rgba(0,0,0,0.25)] p-6 flex flex-col bg-white mt-6">
             <h2 className="text-xl font-semibold mb-4 pt-10">Applied Quizzes</h2>
 
             {/* Flex container to push button to bottom */}
@@ -66,7 +66,7 @@ const Home = () => {
           </div>
 
           {/* Previous + Skipped Quizzes Section - Box 2 */}
-          <div className="w-130 shrink-0 h-170 rounded-[10%] border border-gray-300 shadow-[0px_4px_4px_0px_rgba(0,0,0,0.25)] p-6 flex flex-col bg-white mt-6">
+          <div className=" overflow-y-auto [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden w-130 shrink-0 h-170 rounded-[10%] border border-gray-300 shadow-[0px_4px_4px_0px_rgba(0,0,0,0.25)] p-6 flex flex-col bg-white mt-6">
             <h2 className="text-xl font-semibold mb-4 pt-10">Previous Quizzes</h2>
 
             <div className="flex-1 overflow-y-auto">
