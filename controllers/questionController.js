@@ -1,28 +1,7 @@
-const express = require("express");
-const cors = require("cors");
-require("dotenv").config();
-const supabase = require("./supabase");
+import supabase from "../config/supabase.js";
 
-const app = express();
-app.use(cors());
-app.use(express.json());
-
-const TECH_TEAM_KEY = process.env.TECH_TEAM_KEY;
-
-// Middleware to restrict modifications to Tech team
-function techTeamAuth(req, res, next) {
-  const apiKey = req.headers["x-api-key"];
-  if (apiKey !== TECH_TEAM_KEY) {
-    return res.status(403).json({ error: "Forbidden: Tech team only" });
-  }
-  next();
-}
-
-/**
- * POST /questions
- * Add a new question (Tech team only)
- */
-app.post("/questions", techTeamAuth, async (req, res) => {
+/** POST /questions */
+export const addQuestion = async (req, res) => {
   try {
     const {
       id,
@@ -78,13 +57,10 @@ app.post("/questions", techTeamAuth, async (req, res) => {
   } catch (err) {
     res.status(400).json({ error: err.message });
   }
-});
+};
 
-/**
- * GET /questions
- * Retrieve all questions with optional filters
- */
-app.get("/questions", async (req, res) => {
+/** GET /questions */
+export const getQuestions = async (req, res) => {
   try {
     const { q_type, subject, grade, chapter_number, disabled } = req.query;
 
@@ -102,13 +78,10 @@ app.get("/questions", async (req, res) => {
   } catch (err) {
     res.status(400).json({ error: err.message });
   }
-});
+};
 
-/**
- * GET /questions/:id
- * Retrieve a specific question by ID
- */
-app.get("/questions/:id", async (req, res) => {
+/** GET /questions/:id */
+export const getQuestionById = async (req, res) => {
   try {
     const { id } = req.params;
     const { data, error } = await supabase
@@ -119,16 +92,13 @@ app.get("/questions/:id", async (req, res) => {
 
     if (error) throw error;
     res.json(data);
-  } catch (err) {
+  } catch {
     res.status(404).json({ error: "Question not found" });
   }
-});
+};
 
-/**
- * PUT /questions/:id
- * Update a question (Tech team only)
- */
-app.put("/questions/:id", techTeamAuth, async (req, res) => {
+/** PUT /questions/:id */
+export const updateQuestion = async (req, res) => {
   try {
     const { id } = req.params;
     const updates = req.body;
@@ -144,13 +114,10 @@ app.put("/questions/:id", techTeamAuth, async (req, res) => {
   } catch (err) {
     res.status(400).json({ error: err.message });
   }
-});
+};
 
-/**
- * DELETE /questions/:id
- * Delete a question (Tech team only)
- */
-app.delete("/questions/:id", techTeamAuth, async (req, res) => {
+/** DELETE /questions/:id */
+export const deleteQuestion = async (req, res) => {
   try {
     const { id } = req.params;
     const { data, error } = await supabase
@@ -164,7 +131,4 @@ app.delete("/questions/:id", techTeamAuth, async (req, res) => {
   } catch (err) {
     res.status(400).json({ error: err.message });
   }
-});
-
-const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+};
