@@ -1,0 +1,54 @@
+/* Card Component Styles */
+.card-component {
+    background: linear-gradient(135deg, rgba(30, 41, 59, 0.8), rgba(15, 23, 42, 0.8));
+    backdrop-filter: blur(12px);
+    border: 1px solid rgba(71, 85, 105, 0.5);
+    border-radius: 1rem;
+    transition: all 0.3s ease;
+}
+
+.card-padded {
+    padding: 1.5rem;
+}
+
+/* Variants */
+.card-default {
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+}
+
+.card-elevated {
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.3);
+}
+
+.card-outlined {
+    background: transparent;
+    border: 2px solid #475569;
+}
+
+/* Hover effect */
+.card-hoverable:hover {
+    border-color: rgba(99, 102, 241, 0.5);
+    box-shadow: 0 20px 25px -5px rgba(99, 102, 241, 0.1);
+    transform: translateY(-2px);
+}
+
+.card-clickable {
+    cursor: pointer;
+}
+
+/* Subcomponents */
+.card-header {
+    padding-bottom: 1rem;
+    border-bottom: 1px solid rgba(71, 85, 105, 0.5);
+    margin-bottom: 1rem;
+}
+
+.card-body {
+    flex: 1;
+}
+
+.card-footer {
+    padding-top: 1rem;
+    border-top: 1px solid rgba(71, 85, 105, 0.5);
+    margin-top: 1rem;
+}

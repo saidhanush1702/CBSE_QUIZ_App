@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<body>
+    <h2>Multiplayer Creator Test</h2>
+    <button onclick="loginAndCreate()">Login as Student & Create Lobby</button>
+    <div id="logs"></div>
+
+    <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+    <script>
+        const SUPABASE_URL = 'https://hinkisyznnlaxjwxiumx.supabase.co';
+        const ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imhpbmtpc3l6bm5sYXhqd3hpdW14Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjgxNDEwMDUsImV4cCI6MjA4MzcxNzAwNX0.0fUCMPc6kbfVKHcRgMG4dXlI6tcwcxa0pzQOehcIGM4';
+
+        const client = supabase.createClient(SUPABASE_URL, ANON_KEY);
+
+        async function loginAndCreate() {
+            // 1. Login as STUDENT
+            const { data: { user }, error: loginErr } = await client.auth.signInWithPassword({ 
+                email: 'student@demo.com', 
+                password: 'password123' 
+            });
+            
+            if(loginErr) return console.log("Login fail", loginErr);
+            console.log("Logged in as:", user.id);
+
+            // 2. Try to Create Lobby (Frontend Logic)
+            const joinCode = Math.random().toString(36).substring(2, 8).toUpperCase();
+            // Use a valid quiz_id you have in DB
+            const quizId = 'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11'; 
+
+            const { data, error } = await client
+                .from('multiplayer_sessions')
+                .insert([{
+                    quiz_id: quizId,
+                    host_id: user.id, // I am the host
+                    join_code: joinCode,
+                    players: [],
+                    is_started: false
+                }])
+                .select()
+                .single();
+
+            if (error) {
+                document.getElementById('logs').innerText = "❌ Creation Failed: " + error.message;
+            } else {
+                document.getElementById('logs').innerText = "✅ Lobby Created! Code: " + data.join_code;
+                
+                // 3. Try to Start Game (Should work because I am host)
+                await startGame(data.id);
+            }
+        }
+
+        async function startGame(sessionId) {
+            const { error } = await client
+                .from('multiplayer_sessions')
+                .update({ is_started: true })
+                .eq('id', sessionId);
+            
+            if (error) document.getElementById('logs').innerText += "\n❌ Start Failed: " + error.message;
+            else document.getElementById('logs').innerText += "\n✅ Game Started by Student Host!";
+        }
+    </script>
+</body>

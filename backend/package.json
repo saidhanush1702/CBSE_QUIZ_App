@@ -1,0 +1,31 @@
+{
+  "name": "2511_mpq-fb",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "dev": "nodemon server.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/SmaranAI/2511_MPQ-FB.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "module",
+  "bugs": {
+    "url": "https://github.com/SmaranAI/2511_MPQ-FB/issues"
+  },
+  "homepage": "https://github.com/SmaranAI/2511_MPQ-FB#readme",
+  "dependencies": {
+    "@supabase/supabase-js": "^2.81.0",
+    "cors": "^2.8.5",
+    "dotenv": "^17.2.3",
+    "express": "^5.1.0",
+    "jsonwebtoken": "^9.0.2",
+    "nodemon": "^3.1.10",
+    "socket.io": "^4.8.1"
+  }
+}

@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Edge Function Tester</title>
+    <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+    <style>
+        body { font-family: sans-serif; padding: 20px; max-width: 600px; margin: auto; }
+        button { padding: 10px; margin: 5px 0; cursor: pointer; width: 100%; }
+        #status { white-space: pre-wrap; background: #f4f4f4; padding: 10px; margin-top: 10px; }
+    </style>
+</head>
+<body>
+    <h2>Step 2 Tester: Submit Quiz</h2>
+    
+    <input type="email" id="email" placeholder="Student Email" value="student@demo.com"><br>
+    <input type="password" id="password" placeholder="Password" value="password123"><br>
+    <button onclick="login()">1. Login</button>
+
+    <button onclick="startAttempt()" disabled id="btnStart">2. Start Quiz Attempt</button>
+    <button onclick="submitQuiz()" disabled id="btnSubmit">3. Submit to Edge Function</button>
+
+    <div id="status">Logs will appear here...</div>
+
+    <script>
+        // REPLACE THESE WITH YOUR KEYS
+        const SUPABASE_URL = 'https://hinkisyznnlaxjwxiumx.supabase.co';
+        const ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imhpbmtpc3l6bm5sYXhqd3hpdW14Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjgxNDEwMDUsImV4cCI6MjA4MzcxNzAwNX0.0fUCMPc6kbfVKHcRgMG4dXlI6tcwcxa0pzQOehcIGM4';
+
+        const client = supabase.createClient(SUPABASE_URL, ANON_KEY);
+        const QUIZ_ID = 'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11'; // The ID we inserted in SQL
+        let userId = null;
+
+        async function login() {
+            log("Logging in...");
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            
+            const { data, error } = await client.auth.signInWithPassword({ email, password });
+            if (error) return log("Login Error: " + error.message);
+            
+            userId = data.user.id;
+            log("Login Success! User ID: " + userId);
+            document.getElementById('btnStart').disabled = false;
+        }
+
+        async function startAttempt() {
+            log("Creating attempt in Database...");
+            // We insert an 'in_progress' attempt manually (simulating the student starting)
+            // We purposely give the WRONG answer initially to see if the grader catches it? 
+            // No, let's give the CORRECT answer '20' to see if we get points.
+            const answers = { "q1": "20" }; 
+
+            const { data, error } = await client
+                .from('user_attempts')
+                .insert([{ 
+                    quiz_id: QUIZ_ID, 
+                    user_id: userId, 
+                    status: 'in_progress',
+                    answers: answers 
+                }])
+                .select()
+                .single();
+
+            if (error) return log("Start Error: " + error.message);
+            
+            log("Attempt Started via DB. Attempt ID: " + data.id);
+            log("Answers saved: " + JSON.stringify(answers));
+            document.getElementById('btnSubmit').disabled = false;
+        }
+
+        async function submitQuiz() {
+            log("🚀 Invoking Edge Function: submit-quiz...");
+            
+            const { data, error } = await client.functions.invoke('submit-quiz', {
+                body: { quiz_id: QUIZ_ID }
+            });
+
+            if (error) return log("Function Error: " + error.message);
+            
+            log("✅ Function Response: " + JSON.stringify(data, null, 2));
+            log("Check your 'user_attempts' table in Supabase. The status should be 'completed' and score should be 5.");
+        }
+
+        function log(msg) {
+            document.getElementById('status').textContent += "\n" + msg;
+            console.log(msg);
+        }
+    </script>
+</body>
+</html>

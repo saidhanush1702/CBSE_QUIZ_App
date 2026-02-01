@@ -1,0 +1,219 @@
+
+======================
+USERS MODULE
+======================
+page -- 
+# Get user profile
+curl -X GET "http://localhost:5000/api/users/<USER_ID>" \
+  -H "Authorization: Bearer <ACCESS_TOKEN>"
+
+page -- 
+# Get quizzes created by user
+curl -X GET "http://localhost:5000/api/users/<USER_ID>/quizzes" \
+  -H "Authorization: Bearer <ACCESS_TOKEN>"
+
+
+page -- 
+# Get user quiz history
+curl -X GET "http://localhost:5000/api/users/<USER_ID>/history" \
+  -H "Authorization: Bearer <ACCESS_TOKEN>"
+
+======================
+QUESTIONS MODULE
+======================
+
+page -- 
+# Get all questions
+curl -X GET "http://localhost:5000/api/questions" \
+  -H "Authorization: Bearer <ACCESS_TOKEN>"
+
+
+page -- 5
+# Get question by ID
+curl -X GET "http://localhost:5000/api/questions/<QUESTION_ID>" \
+  -H "Authorization: Bearer <ACCESS_TOKEN>"
+
+
+page -- 3
+# Create question (teacher/admin)
+curl -X POST "http://localhost:5000/api/questions" \
+  -H "Authorization: Bearer <TEACHER_TOKEN>" \
+  -H "Content-Type: application/json" \
+  -d '{"question":"What is 2+2?","q_type":"mcq","options":["1","2","3","4"],"correct_answer":"4","max_marks":1,"subject":"Math"}'
+
+
+page -- 3
+# Update question
+curl -X PATCH "http://localhost:5000/api/questions/<QUESTION_ID>" \
+  -H "Authorization: Bearer <TEACHER_TOKEN>" \
+  -H "Content-Type: application/json" \
+  -d '{"remarks":"Updated wording"}'
+
+
+page -- 3
+# Soft-delete question
+curl -X DELETE "http://localhost:5000/api/questions/<QUESTION_ID>" \
+  -H "Authorization: Bearer <TEACHER_TOKEN>"
+
+======================
+QUIZZES MODULE
+======================
+
+page -- 3
+# Create quiz
+curl -X POST "http://localhost:5000/api/quizzes" \
+  -H "Authorization: Bearer <TEACHER_TOKEN>" \
+  -H "Content-Type: application/json" \
+  -d '{"title":"Math Practice Test 1","mode":"individual","method":"test","selection_type":"manual","subject":"Math","question_ids":["q_123","q_456"]}'
+
+
+page -- 1
+# Get all quizzes
+curl -X GET "http://localhost:5000/api/quizzes" \
+  -H "Authorization: Bearer <ACCESS_TOKEN>"
+
+
+page -- 
+# Get quiz by ID
+curl -X GET "http://localhost:5000/api/quizzes/<QUIZ_ID>" \
+  -H "Authorization: Bearer <ACCESS_TOKEN>"
+
+
+page -- 5
+# Get quiz questions
+curl -X GET "http://localhost:5000/api/quizzes/<QUIZ_ID>/questions" \
+  -H "Authorization: Bearer <ACCESS_TOKEN>"
+
+
+page -- 
+# Filter by mode
+curl -X GET "http://localhost:5000/api/quizzes/filter/mode/individual" \
+  -H "Authorization: Bearer <ACCESS_TOKEN>"
+
+
+page -- 
+# Filter by method
+curl -X GET "http://localhost:5000/api/quizzes/filter/method/test" \
+  -H "Authorization: Bearer <ACCESS_TOKEN>"
+
+
+page -- 
+# Latest quizzes
+curl -X GET "http://localhost:5000/api/quizzes/latest?limit=5" \
+  -H "Authorization: Bearer <ACCESS_TOKEN>"
+
+
+page -- 
+# Update quiz
+curl -X PATCH "http://localhost:5000/api/quizzes/<QUIZ_ID>" \
+  -H "Authorization: Bearer <TEACHER_TOKEN>" \
+  -H "Content-Type: application/json" \
+  -d '{"title":"Updated Math Practice"}'
+
+
+page -- 
+# Delete quiz
+curl -X DELETE "http://localhost:5000/api/quizzes/<QUIZ_ID>" \
+  -H "Authorization: Bearer <TEACHER_TOKEN>"
+
+======================
+QUIZ ATTEMPTS MODULE
+======================
+
+page -- 1
+# Start quiz
+curl -X POST "http://localhost:5000/api/quizzes/<QUIZ_ID>/start" \
+  -H "Authorization: Bearer <STUDENT_TOKEN>"
+
+
+page -- 5
+# Save answer
+curl -X POST "http://localhost:5000/api/quizzes/<QUIZ_ID>/answer" \
+  -H "Authorization: Bearer <STUDENT_TOKEN>" \
+  -H "Content-Type: application/json" \
+  -d '{"question_id":"<QUESTION_ID>","selected_answer":"4"}'
+
+
+page -- 
+# Submit quiz
+curl -X POST "http://localhost:5000/api/quizzes/<QUIZ_ID>/submit" \
+  -H "Authorization: Bearer <STUDENT_TOKEN>"
+
+
+page -- 
+# Update attempt status
+curl -X PATCH "http://localhost:5000/api/quizzes/<QUIZ_ID>/status" \
+  -H "Authorization: Bearer <STUDENT_TOKEN>" \
+  -H "Content-Type: application/json" \
+  -d '{"status":"skipped"}'
+
+
+page -- 4
+# Get user attempts
+curl -X GET "http://localhost:5000/api/quizzes/user/<USER_ID>/attempts" \
+  -H "Authorization: Bearer <STUDENT_TOKEN>"
+
+
+page -- 1
+# Get completed quizzes
+curl -X GET "http://localhost:5000/api/quizzes/user/<USER_ID>/completed" \
+  -H "Authorization: Bearer <STUDENT_TOKEN>"
+
+
+page -- 1
+# Get skipped quizzes
+curl -X GET "http://localhost:5000/api/quizzes/user/<USER_ID>/skipped" \
+  -H "Authorization: Bearer <STUDENT_TOKEN>"
+
+page -- 1
+# Get revision quizzes
+curl -X GET "http://localhost:5000/api/quizzes/user/<USER_ID>/revision" \
+  -H "Authorization: Bearer <STUDENT_TOKEN>"
+
+
+page -- 4
+# Get quiz result
+curl -X GET "http://localhost:5000/api/quizzes/<QUIZ_ID>/result/<USER_ID>" \
+  -H "Authorization: Bearer <ACCESS_TOKEN>"
+
+======================
+MULTIPLAYER MODULE
+======================
+
+page -- 9
+# Create lobby
+curl -X POST "http://localhost:5000/api/multiplayer/create" \
+  -H "Authorization: Bearer <TEACHER_ACCESS_TOKEN>" \
+  -H "Content-Type: application/json" \
+  -d '{"quiz_id":"<QUIZ_ID>"}'
+
+page -- 10
+# Join lobby
+curl -X POST "http://localhost:5000/api/multiplayer/join" \
+  -H "Authorization: Bearer <STUDENT_ACCESS_TOKEN>" \
+  -H "Content-Type: application/json" \
+  -d '{"join_code":"<JOIN_CODE>"}'
+
+page -- 10
+# Get lobby info
+curl -X GET "http://localhost:5000/api/multiplayer/<SESSION_ID>" \
+  -H "Authorization: Bearer <ACCESS_TOKEN>"
+
+
+page -- 9
+# Start session (host)
+curl -X POST "http://localhost:5000/api/multiplayer/<SESSION_ID>/start" \
+  -H "Authorization: Bearer <TEACHER_ACCESS_TOKEN>"
+
+page -- 
+# Submit multiplayer answers
+curl -X POST "http://localhost:5000/api/multiplayer/<SESSION_ID>/submit" \
+  -H "Authorization: Bearer <STUDENT_ACCESS_TOKEN>" \
+  -H "Content-Type: application/json" \
+  -d '{"answers":{"q_1":"A","q_2":"B"}}'
+
+
+page -- 11
+# End session (host)
+curl -X POST "http://localhost:5000/api/multiplayer/<SESSION_ID>/end" \
+  -H "Authorization: Bearer <TEACHER_ACCESS_TOKEN>"

@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Submit Multiplayer Test</title>
+    <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+    <style>
+        body { font-family: sans-serif; padding: 20px; max-width: 600px; margin: auto; }
+        input, button { padding: 10px; margin: 5px 0; width: 100%; }
+        #logs { white-space: pre-wrap; background: #f4f4f4; padding: 10px; margin-top: 10px; border: 1px solid #ddd; }
+    </style>
+</head>
+<body>
+    <h2>Test Multiplayer Submission</h2>
+    
+    <label>1. Session ID (from multiplayer_sessions table):</label>
+    <input id="sessionId" placeholder="e.g. 550e8400-e29b..." />
+
+    <label>2. Dummy Answers (JSON):</label>
+    <textarea id="answers" rows="4" style="width:100%">
+{
+  "q1": "20", 
+  "q2": "Wrong Answer"
+}
+    </textarea>
+
+    <button onclick="submitAnswers()">3. Login & Submit</button>
+
+    <div id="logs">Logs will appear here...</div>
+
+    <script>
+        const SUPABASE_URL = 'https://hinkisyznnlaxjwxiumx.supabase.co';
+        const ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imhpbmtpc3l6bm5sYXhqd3hpdW14Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjgxNDEwMDUsImV4cCI6MjA4MzcxNzAwNX0.0fUCMPc6kbfVKHcRgMG4dXlI6tcwcxa0pzQOehcIGM4';
+
+        const client = supabase.createClient(SUPABASE_URL, ANON_KEY);
+
+        async function submitAnswers() {
+            const sessionId = document.getElementById('sessionId').value;
+            const answersRaw = document.getElementById('answers').value;
+            let answers;
+
+            try {
+                answers = JSON.parse(answersRaw);
+            } catch (e) {
+                return log("❌ Invalid JSON in answers box");
+            }
+
+            log("🔄 Logging in...");
+            
+            // 1. Login as Student
+            const { error: authError } = await client.auth.signInWithPassword({ 
+                email: 'student@demo.com', 
+                password: 'password123' 
+            });
+
+            if (authError) return log("❌ Login Failed: " + authError.message);
+            log("✅ Logged in.");
+
+            // 2. Invoke Edge Function
+            log("🚀 Sending Answers to 'submit-multiplayer'...");
+            const { data, error } = await client.functions.invoke('submit-multiplayer', {
+                body: { 
+                    session_id: sessionId,
+                    answers: answers 
+                }
+            });
+
+            if (error) {
+                log("❌ Function Connection Error: " + error.message);
+            } else if (data.error) {
+                log("⚠️ Logic Error: " + data.error);
+            } else {
+                log("✅ SUCCESS! Submission Received.");
+                log("🎯 Score Calculated: " + data.score);
+                log("💾 Saved Data: " + JSON.stringify(data.data, null, 2));
+            }
+        }
+
+        function log(msg) {
+            const el = document.getElementById('logs');
+            el.innerText += "\n" + msg;
+            console.log(msg);
+        }
+    </script>
+</body>
+</html>

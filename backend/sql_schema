@@ -1,0 +1,102 @@
+
+
+
+CREATE TABLE public.multiplayer_results (
+  id uuid NOT NULL DEFAULT gen_random_uuid(),
+  session_id uuid,
+  user_id text NOT NULL,
+  answers jsonb DEFAULT '{}'::jsonb,
+  score integer DEFAULT 0,
+  submitted_at timestamp without time zone DEFAULT now(),
+  CONSTRAINT multiplayer_results_pkey PRIMARY KEY (id),
+  CONSTRAINT multiplayer_results_session_id_fkey FOREIGN KEY (session_id) REFERENCES public.multiplayer_sessions(id)
+);
+CREATE TABLE public.multiplayer_sessions (
+  id uuid NOT NULL DEFAULT gen_random_uuid(),
+  quiz_id uuid,
+  host_id text NOT NULL,
+  join_code text NOT NULL UNIQUE,
+  players jsonb DEFAULT '[]'::jsonb,
+  is_started boolean DEFAULT false,
+  created_at timestamp without time zone DEFAULT now(),
+  is_ended boolean DEFAULT false,
+  CONSTRAINT multiplayer_sessions_pkey PRIMARY KEY (id),
+  CONSTRAINT multiplayer_sessions_quiz_id_fkey FOREIGN KEY (quiz_id) REFERENCES public.quizzes(id)
+);
+CREATE TABLE public.questions (
+  id text NOT NULL,
+  question text NOT NULL,
+  options jsonb,
+  correct_answer text,
+  chunk_id text,
+  q_id text,
+  q_type text CHECK (q_type = ANY (ARRAY['mcq'::text, 'true_false'::text, 'fill_blank'::text, 'match'::text, 'short'::text, 'long'::text, 'diagram'::text])),
+  max_marks integer,
+  subject text,
+  grade text,
+  chapter_number text,
+  chapter_name text,
+  explanation text,
+  new_answer text,
+  remarks text,
+  disabled boolean DEFAULT false,
+  program text,
+  pdf_path text,
+  pages jsonb,
+  created_by text,
+  created_at timestamp without time zone DEFAULT now(),
+  CONSTRAINT questions_pkey PRIMARY KEY (id),
+  CONSTRAINT questions_created_by_fkey FOREIGN KEY (created_by) REFERENCES public.users(id)
+);
+CREATE TABLE public.quiz_questions (
+  id uuid NOT NULL DEFAULT gen_random_uuid(),
+  quiz_id uuid,
+  question_id text,
+  order integer,
+  marks integer DEFAULT 0,
+  created_at timestamp without time zone DEFAULT now(),
+  CONSTRAINT quiz_questions_pkey PRIMARY KEY (id),
+  CONSTRAINT quiz_questions_quiz_id_fkey FOREIGN KEY (quiz_id) REFERENCES public.quizzes(id),
+  CONSTRAINT quiz_questions_question_id_fkey FOREIGN KEY (question_id) REFERENCES public.questions(id)
+);
+CREATE TABLE public.quizzes (
+  id uuid NOT NULL DEFAULT gen_random_uuid(),
+  title text NOT NULL,
+  mode text NOT NULL CHECK (mode = ANY (ARRAY['individual'::text, 'multi'::text])),
+  method text DEFAULT 'test'::text CHECK (method = ANY (ARRAY['test'::text, 'revision'::text])),
+  selection_type text DEFAULT 'auto'::text CHECK (selection_type = ANY (ARRAY['auto'::text, 'manual'::text])),
+  created_by text NOT NULL,
+  created_by_role text NOT NULL CHECK (created_by_role = ANY (ARRAY['student'::text, 'teacher'::text, 'admin'::text, 'tech'::text])),
+  subject text,
+  duration integer,
+  timer_per_question integer,
+  max_marks integer,
+  is_active boolean DEFAULT true,
+  created_at timestamp without time zone DEFAULT now(),
+  CONSTRAINT quizzes_pkey PRIMARY KEY (id)
+);
+CREATE TABLE public.user_attempts (
+  id uuid NOT NULL DEFAULT gen_random_uuid(),
+  quiz_id uuid,
+  user_id text NOT NULL,
+  attempt_number integer DEFAULT 1,
+  status text DEFAULT 'in_progress'::text CHECK (status = ANY (ARRAY['in_progress'::text, 'attempted'::text, 'completed'::text, 'skipped'::text])),
+  score integer DEFAULT 0,
+  total_questions integer DEFAULT 0,
+  answers jsonb DEFAULT '{}'::jsonb,
+  marked_questions jsonb DEFAULT '[]'::jsonb,
+  started_at timestamp without time zone DEFAULT now(),
+  completed_at timestamp without time zone,
+  total_marks integer DEFAULT 0,
+  CONSTRAINT user_attempts_pkey PRIMARY KEY (id),
+  CONSTRAINT user_attempts_quiz_id_fkey FOREIGN KEY (quiz_id) REFERENCES public.quizzes(id)
+);
+CREATE TABLE public.users (
+  id text NOT NULL,
+  name text,
+  email text UNIQUE,
+  role text NOT NULL DEFAULT 'student'::text CHECK (role = ANY (ARRAY['student'::text, 'teacher'::text, 'admin'::text, 'tech'::text])),
+  avatar_url text,
+  created_at timestamp without time zone DEFAULT now(),
+  CONSTRAINT users_pkey PRIMARY KEY (id)
+);

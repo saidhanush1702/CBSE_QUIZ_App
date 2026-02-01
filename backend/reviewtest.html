@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Review Quiz Tester</title>
+    <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+    <style>
+        body { font-family: sans-serif; padding: 20px; max-width: 600px; margin: auto; }
+        button { padding: 10px; margin: 5px 0; cursor: pointer; width: 100%; }
+        #status { white-space: pre-wrap; background: #f4f4f4; padding: 10px; border: 1px solid #ddd; }
+        .success { color: green; }
+        .error { color: red; }
+    </style>
+</head>
+<body>
+    <h2>Step 3: Test Review Mode</h2>
+    
+    <button onclick="login()">1. Login as Student</button>
+    
+    <button onclick="fetchReview()" disabled id="btnReview">2. Fetch Review Data (Correct Answers)</button>
+
+    <div id="status">Logs will appear here...</div>
+
+    <script>
+        // 1. SETUP
+        const SUPABASE_URL = 'https://hinkisyznnlaxjwxiumx.supabase.co';
+        const ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imhpbmtpc3l6bm5sYXhqd3hpdW14Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjgxNDEwMDUsImV4cCI6MjA4MzcxNzAwNX0.0fUCMPc6kbfVKHcRgMG4dXlI6tcwcxa0pzQOehcIGM4';
+        const client = supabase.createClient(SUPABASE_URL, ANON_KEY);
+
+        // Use the SAME Quiz ID from our previous test
+        const QUIZ_ID = 'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11'; 
+
+        function log(msg, type='') {
+            const el = document.getElementById('status');
+            el.innerHTML += `<div class="${type}">${msg}</div>`;
+        }
+
+        // 2. LOGIN
+        async function login() {
+            const email = 'student@demo.com'; 
+            const password = 'password123';
+            
+            const { data, error } = await client.auth.signInWithPassword({ email, password });
+            if (error) return log("Login Error: " + error.message, 'error');
+            
+            log("✅ Login Success", 'success');
+            document.getElementById('btnReview').disabled = false;
+        }
+
+        // 3. INVOKE FUNCTION
+        async function fetchReview() {
+            log("⏳ Requesting Review Data...");
+
+            const { data, error } = await client.functions.invoke('review-quiz', {
+                body: { quiz_id: QUIZ_ID }
+            });
+
+            if (error) {
+                // If the function sends a 400/403, Supabase client might throw here
+                return log("Function Error: " + error.message, 'error');
+            }
+            
+            if (data.error) {
+                return log("❌ Server Logic Error: " + data.error, 'error');
+            }
+
+            console.log("Full Data:", data);
+            log("✅ SUCCESS! Received Answer Key:", 'success');
+            log(JSON.stringify(data, null, 2));
+        }
+    </script>
+</body>
+</html>
